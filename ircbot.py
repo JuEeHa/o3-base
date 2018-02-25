@@ -51,6 +51,11 @@ class LoggerThread(threading.Thread):
 				else:
 					print('--- ???', message_data)
 
+			# Messages about status from the bot code
+			elif message_type == logmessage_types.status:
+				assert len(message_data) == 1
+				print('*', message_data[0])
+
 			else:
 				print('???', message_type, message_data)
 
@@ -93,6 +98,11 @@ class API:
 		with self.serverthread_object.nick_lock:
 			return self.serverthread_object.nick
 
+	def set_nick(self, nick):
+		"""Set the internal nick tracking state"""
+		with self.serverthread_object.nick_lock:
+			self.serverthread_object.nick = nick
+
 	def join(self, channel):
 		"""Send a JOIN command and update the internal channel tracking state"""
 		with self.serverthread_object.channels_lock:
@@ -111,6 +121,15 @@ class API:
 		"""Returns the current set of channels"""
 		with self.serverthread_object.channels_lock:
 			return self.serverthread_object.channels
+
+	def set_channels(self, channels):
+		"""Set the current set of channels variable"""
+		with self.serverthread_object.channels_lock:
+			self.serverthread_object.channels = channels
+
+	def log(self, message):
+		"""Log a status message"""
+		self.serverthread_object.logging_channel.send((logmessage_types.status, message))
 
 	def error(self, message):
 		"""Log an error"""

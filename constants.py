@@ -1,7 +1,7 @@
 import enum
 
 class logmessage_types(enum.Enum):
-	sent, received, internal = range(3)
+	sent, received, internal, status = range(4)
 
 class internal_submessage_types(enum.Enum):
 	quit, error = range(2)
