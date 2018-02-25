@@ -53,8 +53,9 @@ class LoggerThread(threading.Thread):
 
 			# Messages about status from the bot code
 			elif message_type == logmessage_types.status:
-				assert len(message_data) == 1
-				print('*', message_data[0])
+				assert len(message_data) == 2
+				print('*', end='')
+				print(*message_data[0], **message_data[1])
 
 			else:
 				print('???', message_type, message_data)
@@ -127,9 +128,9 @@ class API:
 		with self.serverthread_object.channels_lock:
 			self.serverthread_object.channels = channels
 
-	def log(self, message):
-		"""Log a status message"""
-		self.serverthread_object.logging_channel.send((logmessage_types.status, message))
+	def log(self, *args, **kwargs):
+		"""Log a status message. Supports normal print() arguments."""
+		self.serverthread_object.logging_channel.send((logmessage_types.status, args, kwargs))
 
 	def error(self, message):
 		"""Log an error"""
