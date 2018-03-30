@@ -12,14 +12,14 @@ class Channel:
 		self.poll.register(self.read_socket, select.POLLIN)
 
 		# Store messages in a list
-		self.mesages = []
+		self.messages = []
 		self.messages_lock = threading.Lock()
 
 	def send(self, message):
 		# Add message to the list of messages and write to the write socket to signal there's data to read
 		with self.messages_lock:
 			self.write_socket.sendall(b'!')
-			self.mesages.append(message)
+			self.messages.append(message)
 
 	def recv(self, blocking = True):
 		# Timeout of -1 will make poll wait until data is available
@@ -41,7 +41,7 @@ class Channel:
 		# Remove first message from the list (FIFO principle), and read one byte from the socket
 		# This keeps the number of available messages and the number of bytes readable in the socket in sync
 		with self.messages_lock:
-			message = self.mesages.pop(0)
+			message = self.messages.pop(0)
 			self.read_socket.recv(1)
 
 		return message
@@ -49,3 +49,15 @@ class Channel:
 	def fileno(self):
 		# Allows for a Channel object to be passed directly to poll()
 		return self.read_socket.fileno()
+
+	def close(self):
+		# Close the file descriptors, so that we aren't leaking them
+		self.write_socket.close()
+		self.read_socket.close()
+
+	# Support with-statements
+	def __enter__(self):
+		return self
+
+	def __exit__(self, exception_type, exception_value, traceback):
+		self.close()
