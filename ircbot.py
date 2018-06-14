@@ -194,6 +194,8 @@ class ServerThread(threading.Thread):
 			pass
 		else:
 			self.logging_channel.send((logmessage_types.received, line.decode(encoding = 'utf-8', errors = 'replace')))
+			# Ensure we have a bytestring, because bytearray can be annoying to deal with
+			line = bytes(line)
 			line_handling.handle_line(line, irc = self.api)
 
 	def mainloop(self):

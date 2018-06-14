@@ -114,7 +114,7 @@ class LineHandlerThread(threading.Thread):
 		try:
 			prefix, command, arguments = parse_line(self.line)
 		except LineParsingError:
-			irc.error("Cannot parse line" + self.line.decode(encoding = 'utf-8', errors = 'replace'))
+			irc.error("Cannot parse line: " + self.line.decode(encoding = 'utf-8', errors = 'replace'))
 
 		if command.upper() == b'PRIVMSG':
 			# PRIVMSG should have two parameters: recipient and the message
