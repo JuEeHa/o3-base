@@ -128,6 +128,11 @@ class API:
 		with self.serverthread_object.channels_lock:
 			self.serverthread_object.channels = channels
 
+	def quit(self):
+		self.serverthread_object.control_channel.send((controlmessage_types.quit,))
+		self.serverthread_object.logging_channel.send((logmessage_types.internal, internal_submessage_types.quit))
+		cron.quit(self.cron)
+
 	def log(self, *args, **kwargs):
 		"""Log a status message. Supports normal print() arguments."""
 		self.serverthread_object.logging_channel.send((logmessage_types.status, args, kwargs))
